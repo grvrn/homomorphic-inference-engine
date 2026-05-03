@@ -1,0 +1,12 @@
+{
+  "feature_names": [
+    "age_years",
+    "annual_income_kusd",
+    "credit_score",
+    "months_employed"
+  ],
+  "fixed_point_scale": 1000000,
+  "test_accuracy": 0.94375,
+  "n_train": 640,
+  "n_test": 160
+}
