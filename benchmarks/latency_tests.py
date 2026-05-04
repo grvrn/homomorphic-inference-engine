@@ -86,7 +86,7 @@ def benchmark_plaintext_latency(
     return rows
 
 
-def benchmark_he_latency_placeholder(
+def benchmark_he_latency(
     feature_sizes: tuple[int, ...] = DEFAULT_FEATURE_SIZES,
     *,
     he_inference: Callable[[LinearHESpec, np.ndarray], None] | None = None,
