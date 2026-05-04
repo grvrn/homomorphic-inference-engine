@@ -5,7 +5,8 @@ Carol evaluates sum_i (w_i * x_i) + b on ciphertexts where x_i are Alice's
 integer-encoded features and w_i, b are Carol's public integer weights. With
 S denoting ``fixed_point_scale``, weights and bias are scaled so that after
 decryption Alice divides by S**2 to recover the real-valued logit (up to
-rounding error), then applies the usual threshold for binary classification.
+rounding error). For regression this is the predicted real value; for
+classification you may threshold the recovered score (e.g. logistic logit).
 """
 
 from __future__ import annotations
@@ -16,7 +17,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
 
@@ -61,7 +61,7 @@ class LinearHESpec:
 
 
 def export_linear_he_spec(
-    model: LogisticRegression,
+    model: Any,
     scaler: StandardScaler,
     feature_names: list[str],
     fixed_point_scale: int,
@@ -69,13 +69,20 @@ def export_linear_he_spec(
     """
     Build integer weights/bias for homomorphic dot-product + bias.
 
-    Alice should encode each standardized feature as
-    round(z_j * S) with z = (x_raw - mean) / scale from this scaler.
-    Decrypted integer D satisfies D / S**2 ≈ w·z + b (sklearn logit).
+    Works with any sklearn-style linear model exposing ``coef_`` and
+    ``intercept_`` (e.g. ``LinearRegression``, ``LogisticRegression`` for binary).
+
+    Alice encodes standardized features as round(z_j * S) with
+    z = (x_raw - mean) / scale. Decrypted integer D satisfies
+    D / S**2 ≈ w·z + b (same linear map as ``model`` on scaled inputs).
     """
     if fixed_point_scale < 1:
         raise ValueError("fixed_point_scale must be a positive integer")
     coef = np.asarray(model.coef_, dtype=np.float64).ravel()
+    if len(feature_names) != coef.size:
+        raise ValueError(
+            f"len(feature_names)={len(feature_names)} != n_coef={coef.size}"
+        )
     intercept = float(np.asarray(model.intercept_, dtype=np.float64).ravel()[0])
     w_int = np.round(coef * fixed_point_scale).astype(np.int64)
     b_int = int(np.round(intercept * (fixed_point_scale**2)))

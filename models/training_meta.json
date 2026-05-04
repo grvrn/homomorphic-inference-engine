@@ -1,12 +1,15 @@
 {
-  "feature_names": [
-    "age_years",
-    "annual_income_kusd",
-    "credit_score",
-    "months_employed"
+  "dataset": "mnist_784_openml",
+  "digits": [
+    0,
+    1
   ],
+  "n_features": 784,
   "fixed_point_scale": 1000000,
-  "test_accuracy": 0.94375,
-  "n_train": 640,
-  "n_test": 160
+  "test_mse": 0.009949170659963447,
+  "test_accuracy_threshold_0.5": 0.993234100135318,
+  "n_train": 11824,
+  "n_test": 2956,
+  "task": "mnist_binary_linear_regression",
+  "quick_subset": false
 }

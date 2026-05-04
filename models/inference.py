@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
 from .he_spec import LinearHESpec
@@ -29,6 +29,17 @@ def plaintext_logit(
     x = np.asarray(x_raw, dtype=np.float64).reshape(1, -1)
     xs = scaler.transform(x)
     return float(model.decision_function(xs)[0])
+
+
+def plaintext_linear_predict(
+    model: LinearRegression,
+    scaler: StandardScaler,
+    x_raw: np.ndarray,
+) -> float:
+    """Sklearn ``predict`` for one raw sample (scaled linear regression)."""
+    x = np.asarray(x_raw, dtype=np.float64).reshape(1, -1)
+    xs = scaler.transform(x)
+    return float(model.predict(xs)[0])
 
 
 def integer_features_from_raw(
@@ -60,9 +71,17 @@ def recovered_logit_from_integer_dot(
     dot_int: int | float,
     spec: LinearHESpec,
 ) -> float:
-    """Map decrypted integer aggregate back to approximate logit."""
+    """Map decrypted integer aggregate back to approximate linear score / prediction."""
     s = spec.fixed_point_scale
     return float(dot_int) / (s * s)
+
+
+def recovered_prediction_from_integer_dot(
+    dot_int: int | float,
+    spec: LinearHESpec,
+) -> float:
+    """Alias for regression workflows (same math as ``recovered_logit_from_integer_dot``)."""
+    return recovered_logit_from_integer_dot(dot_int, spec)
 
 
 def predict_label_from_logit(logit: float, threshold: float = 0.0) -> int:
