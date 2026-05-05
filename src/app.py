@@ -32,28 +32,6 @@ from models.inference import (
     predict_label_from_logit,
 )
 
-
-# ---------------------------------------------------------------------------
-# Alice-side helpers
-# ---------------------------------------------------------------------------
-
-def encrypt_features(
-    x_int: np.ndarray,
-    keypair: PaillierKeyPair,
-) -> list[PaillierCiphertext]:
-    """Encrypt each integer-encoded feature element-wise under the public key."""
-    pk = keypair.public_key
-    return [encrypt(int(xi), pk) for xi in x_int.ravel()]
-
-
-def decrypt_score(
-    encrypted_score: PaillierCiphertext,
-    keypair: PaillierKeyPair,
-) -> int:
-    """Decrypt the aggregated ciphertext to obtain the integer dot-product + bias."""
-    return decrypt(encrypted_score, keypair.secret_key)
-
-
 # ---------------------------------------------------------------------------
 # Carol-side evaluation (model owner, never sees plaintext)
 # ---------------------------------------------------------------------------

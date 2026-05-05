@@ -78,6 +78,22 @@ def print_table(label: str, rows: list[dict[str, float | int]]) -> None:
     for r in rows:
         print(f"  {r['n_features']:>10}  {r['mean_ms']:>10.4f}  {r['std_ms']:>10.4f}")
 
+def encrypt_features(
+    x_int: np.ndarray,
+    keypair: PaillierKeyPair,
+) -> list[PaillierCiphertext]:
+    """Encrypt each integer-encoded feature element-wise under the public key."""
+    pk = keypair.public_key
+    return [encrypt(int(xi), pk) for xi in x_int.ravel()]
+
+
+def decrypt_score(
+    encrypted_score: PaillierCiphertext,
+    keypair: PaillierKeyPair,
+) -> int:
+    """Decrypt the aggregated ciphertext to obtain the integer dot-product + bias."""
+    return decrypt(encrypted_score, keypair.secret_key)
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(
