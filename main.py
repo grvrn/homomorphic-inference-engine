@@ -293,13 +293,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Homomorphic Inference Engine CLI")
     parser.add_argument(
         "--test",
-        choices=["latency"],
+        choices=["latency", "accuracy"],
         help="Run a benchmark test",
     )
     parser.add_argument(
         "--predict",
         metavar="IMAGE",
         help="Path to a handwritten digit image (0 or 1) for HE inference",
+    )
+    parser.add_argument(
+        "--he-samples",
+        type=int,
+        default=20,
+        help="Number of HE samples for accuracy test (default: 20)",
     )
     args = parser.parse_args()
 
@@ -324,6 +330,12 @@ def main() -> None:
         print_table("Homomorphic", he_rows)
         print_ratio_table(pt_rows, he_rows)
         plot_latency(pt_rows, he_rows)
+
+    elif args.test == "accuracy":
+        from benchmarks.accuracy_tests import main as run_accuracy_tests
+        # Forward the --he-samples argument
+        sys.argv = ["accuracy_tests", "--he-samples", str(args.he_samples)]
+        run_accuracy_tests()
 
 
 if __name__ == "__main__":
