@@ -78,6 +78,20 @@ def evaluate_encrypted(
 # End-to-end pipeline
 # ---------------------------------------------------------------------------
 
+def encrypt_features(
+    x_int: np.ndarray,
+    keypair: PaillierKeyPair,
+) -> list[PaillierCiphertext]:
+    pk = keypair.public_key
+    return [encrypt(int(xi), pk) for xi in x_int.ravel()]
+
+
+def decrypt_score(
+    encrypted_score: PaillierCiphertext,
+    keypair: PaillierKeyPair,
+) -> int:
+    return decrypt(encrypted_score, keypair.secret_key)
+
 def he_inference(
     x: np.ndarray,
     spec: LinearHESpec,

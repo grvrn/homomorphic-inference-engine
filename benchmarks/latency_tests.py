@@ -90,19 +90,34 @@ def benchmark_he_latency(
     feature_sizes: tuple[int, ...] = DEFAULT_FEATURE_SIZES,
     *,
     he_inference: Callable[[LinearHESpec, np.ndarray], None] | None = None,
-) -> None:
+) -> list[dict[str, float | int]]:
     """
     Hook for zirui: pass ``he_inference(spec, x_raw)`` that runs full encrypt→eval→decrypt.
 
     Until wired, this is a no-op documenting the intended interface.
     """
     if he_inference is None:
-        return
+        return []
     rng = np.random.default_rng(1)
+    rows: list[dict[str, float | int]] = []
     for d in feature_sizes:
         spec = spec_for_feature_size(d)
-        x = random_raw_sample(d, rng)
-        he_inference(spec, x)
+        times: list[float] = []
+        for _ in range(3):
+            x = random_raw_sample(d, rng)
+            t0 = time.perf_counter()
+            he_inference(spec, x)
+            times.append((time.perf_counter() - t0) * 1000.0)
+
+        a = np.asarray(times, dtype=np.float64)
+        rows.append(
+            {
+                "n_features": d,
+                "mean_ms": float(a.mean()),
+                "std_ms": float(a.std(ddof=0)),
+            }
+        )
+    return rows
 
 
 if __name__ == "__main__":
