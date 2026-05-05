@@ -7,4 +7,4 @@ keys/
 .idea/
 .paillier_upload_backup/
 .paillier_keep_backup/
-latency_comparison.png
+*.png

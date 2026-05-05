@@ -14,7 +14,7 @@ def encrypt(value: int, public_key):
 def decrypt(encrypted_value, private_key) -> int:
     if hasattr(private_key, "private_key"):
         private_key = private_key.private_key
-    return int(private_key.decrypt(encrypted_value))
+    return int(round(private_key.decrypt(encrypted_value)))
 
 
 def add_encrypted(left, right):
