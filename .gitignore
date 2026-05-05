@@ -8,3 +8,4 @@ keys/
 .paillier_upload_backup/
 .paillier_keep_backup/
 *.png
+.DS_Store
