@@ -71,13 +71,13 @@ def main() -> None:
     print(f"Task           : {task}")
     print(f"Digit classes  : {digits[0]} vs {digits[1]}")
     print(f"Threshold      : {threshold}")
-    print(f"Test samples   : {n_total} (plaintext all, HE subset {n_he})")
+    print(f"Test samples   : {n_he}")
     print()
 
     # ==================================================================
     # Plaintext predictions (all samples)
     # ==================================================================
-    print("Running plaintext predictions on all test samples …")
+    print("Running plaintext predictions on all test samples ...")
     sk_scores: list[float] = []
     for row in X_test:
         x = np.asarray(row, dtype=np.float64).ravel()
@@ -96,7 +96,7 @@ def main() -> None:
     # ==================================================================
     # HE inference (subset)
     # ==================================================================
-    print(f"Running Paillier HE inference on {n_he} samples …")
+    print(f"Running Paillier HE inference on {n_he} samples ...")
     keypair = generate_keypair()
     pk = keypair.public_key
     sk = keypair.secret_key
@@ -143,16 +143,10 @@ def main() -> None:
     mean_diff = float(score_diffs.mean())
     label_agree = int(np.sum(he_labels == sk_labels_he))
 
-    # ==================================================================
     # Results
-    # ==================================================================
     print(f"\n{'═' * 60}")
     print(f"  ACCURACY RESULTS — MNIST digits {digits[0]} vs {digits[1]}")
     print(f"{'═' * 60}")
-
-    print(f"\n  Plaintext Model (all {n_total} samples)")
-    print(f"  {'Accuracy vs true labels':35s} {pt_acc:>10.4f}")
-    print(f"  {'MSE vs true labels':35s} {pt_mse:>10.8f}")
 
     print(f"\n  HE vs Plaintext ({n_he} sample subset, {he_elapsed:.1f}s)")
     print(f"  {'':35s} {'HE':>10s} {'Plaintext':>10s}")
@@ -162,11 +156,6 @@ def main() -> None:
     print(f"  {'Label agreement (HE = Plaintext)':35s} {label_agree:>10d} / {n_he}")
     print(f"  {'Mean |HE score − PT score|':35s} {mean_diff:>10.2e}")
     print(f"  {'Max  |HE score − PT score|':35s} {max_diff:>10.2e}")
-
-    if label_agree == n_he:
-        print(f"\n  ✓ HE and plaintext agree on all {n_he} predictions")
-    else:
-        print(f"\n  ⚠ {n_he - label_agree} prediction(s) disagree between HE and plaintext")
 
     print(f"{'═' * 60}\n")
 

@@ -249,19 +249,19 @@ def predict_mnist_image(image_path: str) -> None:
     print()
 
     # ---- Generate Paillier keys ----
-    print("Generating Paillier key pair …")
+    print("Generating Paillier key pair ...")
     keypair = generate_keypair()
 
     # ---- Run HE inference ----
-    print("Encrypting features …")
+    print("Encrypting features ...")
     x_int = integer_features_from_raw(x_raw, spec)
     enc_features = encrypt_features(x_int, keypair)
     print(f"Encrypted {len(enc_features)} feature ciphertexts")
 
-    print("Evaluating encrypted linear model (Carol) …")
+    print("Evaluating encrypted linear model ...")
     enc_score = evaluate_encrypted(enc_features, spec)
 
-    print("Decrypting result …")
+    print("Decrypting result ...")
     decrypted_int = decrypt_score(enc_score, keypair)
     he_score = recovered_logit_from_integer_dot(decrypted_int, spec)
 
@@ -283,9 +283,9 @@ def predict_mnist_image(image_path: str) -> None:
     print(f"  {'Threshold':20s} {threshold:>12.1f} {threshold:>12.1f}")
     print(f"  {'Predicted digit':20s} {he_digit:>12} {pt_digit:>12}")
     if he_digit != pt_digit:
-        print("  ⚠  Predictions disagree!")
+        print("Predictions do not match")
     else:
-        print("  ✓  Predictions match")
+        print("Predictions match")
     print("═" * 48)
 
 
